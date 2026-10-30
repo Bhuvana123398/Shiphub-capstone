@@ -22,3 +22,13 @@ Found 1 error in src/lib/countByStatus.ts:5
 * Order counts are derived from the orders array so they stay synchronized with the latest order data.
 
 * Keeping counts derived avoids maintaining duplicate state and prevents inconsistencies between orders and their summary counts.
+
+
+# Build and TypeScript Verification
+
+- **TypeScript check:** `npx tsc -b` – Passed with zero errors.
+- **Production build:** `npm run build` – Successful.
+- **Build tool:** Vite 8.3.5.
+- **Git commit:** `36e283e` – Day3 assignment.
+- **Git tag:** `day-3-assessment`.
+**GITHUB URL**:https://github.com/Bhuvana123398/Shiphub-capstone.git 
