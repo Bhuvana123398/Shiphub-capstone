@@ -97,5 +97,26 @@ All four orders and their status summary were displayed correctly.
 
 Search, status filtering, and eligible shipping actions were visible.
 
+# Fresh-Clone Review Report
+Test folder: Shiphub-partner-test
+
+# Commands executed:
+
+git clone https://github.com/Bhuvana123398/Shiphub-capstone.git Shiphub-partner-test
+
+npm run setup
+
+npm run dev
+
+# Observed result:
+
+Backend started successfully on port 3000.
+
+Port 5173 was already occupied, so Vite automatically selected port 5174.
+
+Frontend started successfully at http://localhost:5174/.
+
+All four orders were displayed correctly.
+
 # Conclusion: 
-        The repository can be cloned, configured, installed, built, and run successfully in a fresh environment.
+    The root development script successfully starts both applications from a fresh clone. The alternate frontend port was selected automatically because the default port was occupied.
