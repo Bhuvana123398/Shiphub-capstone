@@ -1,0 +1,18 @@
+{
+  "name": "shiphub-capstone",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "setup": "node scripts/init-env.mjs && npm install && npm --prefix shiphub-api install && npm --prefix shiphub-web install",
+    "dev": "concurrently \"npm --prefix shiphub-api run dev\" \"npm --prefix shiphub-web run dev\"",
+    "build": "npm --prefix shiphub-web run build",
+    "start": "npm --prefix shiphub-api start"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

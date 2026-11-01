@@ -1,9 +1,7 @@
 import type { Order } from "./types";
 
-const API_URL = "http://localhost:3000";
-
 export async function getOrders(): Promise<Order[]> {
-  const response = await fetch(`${API_URL}/orders`);
+  const response = await fetch("/api/orders");
 
   if (!response.ok) {
     throw new Error("Failed to fetch orders");
@@ -17,7 +15,7 @@ export async function updateOrderStatus(
   id: string,
   status: Order["status"]
 ): Promise<void> {
-  const response = await fetch(`${API_URL}/orders/${id}`, {
+  const response = await fetch(`/api/orders/${id}`, {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",
