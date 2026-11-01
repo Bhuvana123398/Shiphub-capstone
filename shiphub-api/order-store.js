@@ -24,7 +24,7 @@ const orders=[
         "status": "Pending"
     }
 ];
-
+let nextId = 1;
 export function getAllOrders() {
     return orders;
 }

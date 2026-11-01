@@ -6,11 +6,14 @@ export function errorHandler(err, req, res, next) {
     return next(err);
   }
 
-  const statusCode = err instanceof HttpError
-    ? err.statusCode
-    : err.status === 400
-      ? 400
-      : 500;
+  const statusCode =
+    err instanceof HttpError
+      ? err.statusCode
+      : Number.isInteger(err.statusCode)
+        ? err.statusCode
+        : err.status === 400
+          ? 400
+          : 500;
 
   if (statusCode >= 500) {
     logger.error(`${req.method} ${req.path} - ${err.stack}`);
@@ -19,9 +22,10 @@ export function errorHandler(err, req, res, next) {
   }
 
   return res.status(statusCode).json({
-    success: false,
     error: statusCode === 500
       ? 'Internal server error'
-      : err.message
+      : err.message,
+    details: err.details ?? [],
+    fields: err.fields ?? {}
   });
 }

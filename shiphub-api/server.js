@@ -6,6 +6,13 @@ import { logger } from './logger.js';
 import { notFound } from './notFound.js';
 import { errorHandler } from './errorHandler.js';
 import { HttpError } from './HttpError.js';
+import { pathToFileURL } from 'node:url';
+import {
+  validateNewShipment,
+  createShipment,
+  getShipmentsByOrderId,
+  paginate
+} from './shipment-store.js';
 const app = express();
 app.use((req, res, next) => {
   const startTime = Date.now();
@@ -122,13 +129,96 @@ app.patch('/orders/:id', (req,res) =>{
     data: updateddorder
   });
 });
+app.post('/orders/:id/shipments', (req, res) => {
+  const { id } = req.params;
+
+  const order = getOrderById(id);
+
+  if (!order) {
+    throw new HttpError(404, `No order exists with ID ${id}`);
+  }
+
+  const validation = validateNewShipment(req.body);
+
+  if (!validation.valid) {
+    const error = new HttpError(400, 'Shipment validation failed');
+    error.details = validation.errors;
+    error.fields = {};
+    throw error;
+  }
+
+  const idempotencyKey = req.get('Idempotency-Key');
+
+  const result = createShipment(
+    id,
+    req.body,
+    idempotencyKey
+  );
+
+  if (result.replayed) {
+    res.set('Idempotency-Replayed', 'true');
+    return res.status(200).json({ data: result.shipment });
+  }
+
+  const location =
+    `/orders/${id}/shipments/${result.shipment.id}`;
+
+  return res
+    .status(201)
+    .location(location)
+    .json({ data: result.shipment });
+});
+app.get('/orders/:id/shipments', (req, res) => {
+  const { id } = req.params;
+
+  if (!getOrderById(id)) {
+    throw new HttpError(404, `No order exists with ID ${id}`);
+  }
+
+  const page = req.query.page === undefined
+    ? 1
+    : Number(req.query.page);
+
+  const limit = req.query.limit === undefined
+    ? 20
+    : Number(req.query.limit);
+
+  if (
+    !Number.isInteger(page) ||
+    page < 1 ||
+    !Number.isInteger(limit) ||
+    limit < 1 ||
+    limit > 100
+  ) {
+    const error = new HttpError(
+      400,
+      'Page must be a positive integer and limit must be between 1 and 100'
+    );
+    error.details = ['Invalid pagination parameters'];
+    error.fields = {
+      page: req.query.page,
+      limit: req.query.limit
+    };
+    throw error;
+  }
+
+  const shipments = getShipmentsByOrderId(id);
+  return res.json(paginate(shipments, page, limit));
+});
 app.use(notFound);
 app.use(errorHandler);
-const server = app.listen(PORT, () => {
-  logger.info(`ShipHub API running at http://localhost:${PORT}`);
-});
+export { app };
 
-server.on('error', (err) => {
-  logger.error(`Server listen error: ${err.message}`);
-  process.exit(1);
-});
+if (
+  process.argv[1] &&
+  import.meta.url === pathToFileURL(process.argv[1]).href
+) {
+  const server = app.listen(PORT, () => {
+    logger.info(`ShipHub API running at http://localhost:${PORT}`);
+  });
+
+  server.on('error', (err) => {
+    logger.error(`Server listen error: ${err.message}`);
+    process.exit(1);
+  });
+}

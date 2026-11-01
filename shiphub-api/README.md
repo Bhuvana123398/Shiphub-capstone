@@ -1,6 +1,6 @@
 # ShipHub – Order Tracking Application
 
-ShipHub is a full-stack order tracking application with an Express.js backend and React frontend. It allows users to view, filter, and manage orders.
+ShipHub is a full-stack order tracking application with an Express.js backend and React frontend. It allows users to view, filter, and manage orders and their shipments.
 
 # 1. Requirements
 
@@ -17,8 +17,25 @@ Shiphub-capstone/
 ├── scripts/           # Setup scripts
 ├── package.json       # Root scripts
 ├── .gitignore
-└── README.md
 ```
+
+# Shipment Endpoints
+POST
+/orders/:id/shipments
+Create a shipment for an order
+
+GET
+/orders/:id/shipments
+Get shipments for an order with pagination
+
+The shipment creation endpoint accepts:
+carrier: DHL, FedEx, or UPS.
+trackingNumber: A string containing 5–40 characters after trimming.
+An optional Idempotency-Key request header prevents duplicate shipments when a client retries the same request.
+The shipment listing endpoint supports:
+page: Page number (default: 1).
+limit: Number of records per page (default: 20, maximum: 100).
+See shiphub-api/docs/api.md for detailed request formats, response examples, validation rules, and error codes.
 
 # 3. Installation and Setup
 
